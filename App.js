@@ -10,9 +10,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 //mapdirections
 import MapViewDirections from 'react-native-maps-directions'
-const origin = { latitude: 51.67599, longitude: -1.7873 }
+//const origin = { latitude: 51.67599, longitude: -1.7873 }
 const destination = { latitude: 51.7075, longitude: -1.7851 }
-const GOOGLE_MAPS_APIKEY = 'AIzaSyDT52TGfcNkMdwaVhrgKjuixYKy3O2ftQ0'
+const GOOGLE_MAPS_APIKEY = 'AIzaSyClEkqVbIx7AIRJXTJGbzCsoQ8qGgBrMe4'
 
 //findmaplocation
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -28,10 +28,15 @@ export const AuthContext = createContext({
   setpassWord: () => {},
   wrongPassword: false,
   setwrongPassword: () => {},
-  originLat: '',
-  setOriginLat: () => {},
-  originLng: '',
-  setOriginLng: () => {},
+  // originLat: '',
+  // setOriginLat: () => {},
+  // originLng: '',
+  // setOriginLng: () => {},
+  origin: {},
+  setOrigin: (lat, lng) => {
+    latitude: lat
+    longitude: lng
+  },
 })
 
 const Stack = createStackNavigator()
@@ -67,9 +72,6 @@ const SignInScreen = () => {
     setwrongPassword,
   } = useContext(AuthContext)
 
-  const [enterName, setenterName] = useState('')
-  const [enterPw, setenterPW] = useState('')
-
   const nav = useNavigation()
   return (
     <View style={styles.layout}>
@@ -101,9 +103,6 @@ const Tryagain = () => {
     wrongPassword,
     setwrongPassword,
   } = useContext(AuthContext)
-
-  const [enterName, setenterName] = useState('')
-  const [enterPw, setenterPW] = useState('')
 
   const nav = useNavigation()
   return (
@@ -167,16 +166,23 @@ const App = () => {
   const [userName, setName] = useState()
   const [passWord, setpassWord] = useState()
   const [wrongPassword, setwrongPassword] = useState()
+  const [enterName, setenterName] = useState('')
+  const [enterPw, setenterPW] = useState('')
+  const [origin, setOrigin] = useState({ latitude: 0, longitude: 0 })
 
   return (
     <AuthContext.Provider
       value={{
         userName,
         setName,
-        passWord,
-        setpassWord,
+        origin,
+        setOrigin,
         wrongPassword,
         setwrongPassword,
+        enterName,
+        setenterName,
+        enterPw,
+        setenterPW,
       }}
     >
       <NavigationContainer>
@@ -187,44 +193,54 @@ const App = () => {
 }
 
 // --- Onboarding screens ---
-const HomeScreen = () => (
-  <View style={styles.mapContainer}>
-    <GooglePlacesAutocomplete
-      styles={{
-        textInput: { flex: 0, width: 400 },
-      }}
-      placeholder="Search"
-      query={{
-        key: GOOGLE_MAPS_APIKEY,
-        language: 'en', // language of the results
-      }}
-      fetchDetails={true}
-      onPress={(data, details) => console.log(details.geometry.location)}
-      onFail={(error) => console.error('fucked it')}
-      requestUrl={{
-        url:
-          'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-        useOnPlatform: 'web',
-      }} // this in only required for use on the web. See https://git.io/JflFv more for details.
-    />
+const HomeScreen = () => {
+  const { origin, setOrigin } = useContext(AuthContext)
 
-    <Text style={styles.text}>mainscreen</Text>
-
-    <MapView
-      style={styles.map}
-      initialRegion={{
-        latitude: 37.78825,
-        longitude: -122.4324,
-      }}
-    >
-      <MapViewDirections
-        origin={origin}
-        destination={destination}
-        apikey={GOOGLE_MAPS_APIKEY}
+  return (
+    <View style={styles.mapContainer}>
+      <GooglePlacesAutocomplete
+        styles={{
+          textInput: { flex: 0, width: 400 },
+        }}
+        placeholder="Search"
+        query={{
+          key: GOOGLE_MAPS_APIKEY,
+          language: 'en', // language of the results
+        }}
+        fetchDetails={true}
+        onPress={(data, details) => {
+          setOrigin({
+            latitude: details.geometry.location.lat,
+            longitude: details.geometry.location.lng,
+          })
+          //console.log(details.geometry.location.lat)
+        }}
+        onFail={(error) => console.error('fucked it')}
+        requestUrl={{
+          url:
+            'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+          useOnPlatform: 'web',
+        }} // this in only required for use on the web. See https://git.io/JflFv more for details.
       />
-    </MapView>
-  </View>
-)
+
+      <Text style={styles.text}>mainscreen</Text>
+
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+        }}
+      >
+        <MapViewDirections
+          origin={origin}
+          destination={destination}
+          apikey={GOOGLE_MAPS_APIKEY}
+        />
+      </MapView>
+    </View>
+  )
+}
 
 export default App
 
