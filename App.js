@@ -12,7 +12,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import MapViewDirections from 'react-native-maps-directions'
 //const origin = { latitude: 51.67599, longitude: -1.7873 }
 const destination = { latitude: 51.7075, longitude: -1.7851 }
+<<<<<<< HEAD
 const GOOGLE_MAPS_APIKEY = 'AIzaSyClEkqVbIx7AIRJXTJGbzCsoQ8qGgBrMe4'
+=======
+const GOOGLE_MAPS_APIKEY = ''
+>>>>>>> 9c773c873985de35f7b7946d2b7882edc2a284ab
 
 //findmaplocation
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
