@@ -34,10 +34,6 @@ export const AuthContext = createContext({
   setpassWord: () => {},
   wrongPassword: false,
   setwrongPassword: () => {},
-  // originLat: '',
-  // setOriginLat: () => {},
-  // originLng: '',
-  // setOriginLng: () => {},
   origin: {},
   setOrigin: (lat, lng) => {
     latitude: lat
