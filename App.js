@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+} from 'react'
 import { StyleSheet, Button, Text, View, TextInput } from 'react-native'
 import {
   CurrentRenderContext,
@@ -12,12 +18,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import MapViewDirections from 'react-native-maps-directions'
 //const origin = { latitude: 51.67599, longitude: -1.7873 }
 const destination = { latitude: 51.7075, longitude: -1.7851 }
-const GOOGLE_MAPS_APIKEY = ''
+const GOOGLE_MAPS_APIKEY = 'AIzaSyClEkqVbIx7AIRJXTJGbzCsoQ8qGgBrMe4'
 
 //findmaplocation
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
-import MapView from 'react-native-maps'
+import MapView, { Marker } from 'react-native-maps'
 
 const Tab = createBottomTabNavigator()
 
@@ -37,6 +43,10 @@ export const AuthContext = createContext({
     latitude: lat
     longitude: lng
   },
+  latitude: '',
+  setlatitude: () => {},
+  longitude: '',
+  setlongitude: () => {},
 })
 
 const Stack = createStackNavigator()
@@ -169,6 +179,8 @@ const App = () => {
   const [enterName, setenterName] = useState('')
   const [enterPw, setenterPW] = useState('')
   const [origin, setOrigin] = useState({ latitude: 0, longitude: 0 })
+  const [latitude, setlatitude] = useState()
+  const [longitude, setlongitude] = useState()
 
   return (
     <AuthContext.Provider
@@ -183,6 +195,10 @@ const App = () => {
         setenterName,
         enterPw,
         setenterPW,
+        latitude,
+        setlatitude,
+        longitude,
+        setlongitude,
       }}
     >
       <NavigationContainer>
@@ -194,7 +210,28 @@ const App = () => {
 
 // --- Onboarding screens ---
 const HomeScreen = () => {
-  const { origin, setOrigin } = useContext(AuthContext)
+  const {
+    origin,
+    setOrigin,
+    latitude,
+    longitude,
+    setlatitude,
+    setlongitude,
+  } = useContext(AuthContext)
+
+  const mapRef = useRef()
+
+  console.log('this is' + latitude)
+
+  useEffect(() => {
+    console.log('effect')
+    if (mapRef.current) {
+      console.log(latitude)
+      mapRef.current.fitToSuppliedMarkers(['origin', 'destination'], {
+        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+      })
+    }
+  })
 
   return (
     <View style={styles.mapContainer}>
@@ -213,6 +250,8 @@ const HomeScreen = () => {
             latitude: details.geometry.location.lat,
             longitude: details.geometry.location.lng,
           })
+          setlatitude(() => details.geometry.location.lat)
+          setlongitude(() => details.geometry.location.lng)
           //console.log(details.geometry.location.lat)
         }}
         onFail={(error) => console.error('fucked it')}
@@ -226,6 +265,7 @@ const HomeScreen = () => {
       <Text style={styles.text}>mainscreen</Text>
 
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
           latitude: 37.78825,
@@ -236,6 +276,26 @@ const HomeScreen = () => {
           origin={origin}
           destination={destination}
           apikey={GOOGLE_MAPS_APIKEY}
+        />
+
+        <Marker
+          coordinate={{
+            latitude: latitude,
+            longitude: longitude,
+          }}
+          title="origin"
+          description={origin.description}
+          identifier="origin"
+        />
+
+        <Marker
+          coordinate={{
+            latitude: 51.69926700000001,
+            longitude: -1.737728,
+          }}
+          title="destination"
+          description={destination.description}
+          identifier="destination"
         />
       </MapView>
     </View>
